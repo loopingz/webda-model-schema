@@ -88,21 +88,25 @@
                   "title": "Polymer Fan",
                   "type": "boolean"
                 },
-                "car": {
-                  "title": "Car",
-                  "type": "object",
-                  "properties": {
-                    "brand": {
-                      "type": "string"
-                    },
-                    "model": {
-                      "type": "string"
-                    }
-                  }
-                },
                 "languages": {
                   "type": "array",
                   "items": {"type": "string"}
+                },
+                "cars": {
+                  "type": "array",
+                  "maxItems": 3,
+                  "items": {
+                    "title": "Car",
+                    "type": "object",
+                    "properties": {
+                      "brand": {
+                        "type": "string"
+                      },
+                      "model": {
+                        "type": "string"
+                      }
+                    }
+                  }
                 }
               },
               "required": ["firstName", "lastName"]

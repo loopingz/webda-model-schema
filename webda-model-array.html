@@ -56,7 +56,6 @@ Polymer({
     },
   },
   _updateCanAdd: function() {
-    console.log(this.schema);
     if (!this.editMode || 
           (this.schema && this.schema.maxItems && this.schema.properties 
             && Object.keys(this.schema.properties).length >= this.schema.maxItems)) {
