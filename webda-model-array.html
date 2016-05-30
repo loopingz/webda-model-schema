@@ -1,0 +1,113 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="webda-model-behavior.html">
+<dom-module id="webda-model-array">
+  <style is="custom-style" include="shared-styles"></style>
+  <template>
+    <style>
+      #content {
+        margin-top: 10px;
+        padding-left: 20px;
+      }
+      iron-icon {
+        left: -30px;
+        position: relative;
+        margin-bottom: -40px;
+      }
+      .arrayElement {
+        position: relative;
+        left: 30px;
+        top: -30px;
+      }
+    </style>
+    <label>[[schema.title]]</label>
+    <div id="content"></div>
+    <template is="dom-if" if="[[canAdd]]">
+      <paper-fab icon="add" on-tap="_addItem" mini></paper-fab>
+    </template>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'webda-model-array',
+  behaviors: [Webda.Behaviors.ModelDisplay],
+  properties: {
+    value: {
+      type: Array,
+      value: function() { return [];},
+      observer: '_addItems'
+    },
+    canAdd: {
+      type: Boolean,
+      value: true
+    },
+    editMode: {
+      type: Boolean,
+      observer: '_editModeChanged'
+    },
+  },
+  _updateCanAdd: function() {
+    console.log(this.schema);
+    if (!this.editMode || 
+          (this.schema && this.schema.maxItems && this.schema.properties 
+            && Object.keys(this.schema.properties).length >= this.schema.maxItems)) {
+      this.canAdd = false;
+      return;
+    }
+    this.canAdd = true;
+  },
+  _editModeChanged: function() {
+    this._updateCanAdd();
+    this._generateModelWidgets();
+  },
+  _addItems: function() {
+    if (this._init) return;
+    for (let i in this.value) {
+      this._addItem();
+    }
+    this._init = true;
+  },
+  _removeItem: function(evt) {
+    if (this.value) {
+      // Remove the value
+      this.value.splice(evt.target.prop, 1);
+      this.fire('value-changed', {'value':this.value});
+      // Reinit the schema properties accordingly
+      this._init = false;
+      this.schema.properties = {};
+      this._addItems();
+      this._updateCanAdd();
+      this._generateModelWidgets();
+    }
+  },
+  _generateTypeWidget: function(prop) {
+    var div = this.create('div');
+    let el = Webda.Behaviors.ModelDisplay._generateTypeWidget.call(this, prop);
+    if (this.editMode) {
+      div.appendChild(this.create('iron-icon', {icon: 'close', onclick: this._removeItem.bind(this), prop: prop}));
+    }
+    div.appendChild(el);
+    return div;
+  },
+  _addItem: function() {
+    if (!this.schema) return;
+    if (!this.schema.properties) {
+      this.schema.properties = {};
+    }
+    var index = Object.keys(this.schema.properties).length;
+    this.schema.properties[index]=JSON.parse(JSON.stringify(this.schema.items));
+    this.schema.properties[index].title = '';
+    this._updateCanAdd();
+    this._generateModelWidgets();
+  }
+});
+</script>
