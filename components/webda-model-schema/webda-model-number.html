@@ -1,0 +1,71 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<dom-module id="webda-model-number">
+  <style is="custom-style" include="shared-styles"></style>
+  <template>
+    <template is="dom-if" if="[[editMode]]">
+      <paper-input id="input" value="{{value}}" type="number" label="[[schema.title]]"></paper-input>
+    </template>
+    <template is="dom-if" if="[[!editMode]]">
+      <div style="margin-bottom: 10px;">
+        <label>[[schema.title]]</label>
+        <div>[[value]]</div>
+      </div>
+    </template>
+  </template>
+</dom-module>
+
+<script>
+/**
+ * @demo demo/index.html
+ */
+Polymer({
+  is: 'webda-model-number',
+  behaviors: [Webda.Behaviors.ModelDisplay],
+  properties: {
+    value: {
+      "type": "Number",
+      "observer": "_validateInput"
+    }
+  },
+  _validateInput: function() {
+    if (!this.editMode) return;
+    if (!this.$$('paper-input')) return;
+    this.$$('paper-input').invalid = !this._validate();
+  },
+  _validate: function() {
+    if (this.schema.multipleOf) {
+      if (this.value % this.schema.multipleOf !== 0 || this.value <= 0) {
+        return false;
+      }
+    }
+    if (this.schema.maximum !== undefined) {
+      if (this.value > this.schema.maximum) {
+        return false;
+      }
+      if (this.value === this.schema.maximum && this.schema.exclusiveMaximum) {
+        return false;
+      }
+    }
+    if (this.schema.minimum !== undefined) {
+      if (this.value < this.schema.minimum) {
+        return false;
+      }
+      if (this.value === this.schema.minimum && this.schema.exclusiveMinimum) {
+        return false;
+      }
+    }
+    return true;
+  }
+});
+</script>

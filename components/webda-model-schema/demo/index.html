@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+  <head>
+    <title>webda-webcomponents-model demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-fab/paper-fab.html">
+
+    <link rel="import" href="../webda-model-object.html">
+    <link rel="import" href="../webda-model-string.html">
+    <link rel="import" href="../webda-model-number.html">
+    <link rel="import" href="../webda-model-array.html">
+    <link rel="import" href="../webda-model-boolean.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+    <script>
+    var basicSchema = {
+      "title": "Example Schema",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "age": {
+          "description": "Age in years",
+          "type": "integer",
+          "minimum": 0
+        },
+        "polymerFan": {
+          "title": "Polymer Fan",
+          "type": "boolean"
+        },
+        "languages": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "cars": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "title": "Car",
+            "type": "object",
+            "properties": {
+              "brand": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": ["firstName", "lastName"]
+    }
+    </script>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic webda-model-object Demo</h3>
+      <demo-snippet>
+        <template id="t" is="dom-bind">
+          <script>
+            var basicSchema = {
+              "title": "Example Schema",
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "age": {
+                  "description": "Age in years",
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "polymerFan": {
+                  "title": "Polymer Fan",
+                  "type": "boolean"
+                },
+                "languages": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "cars": {
+                  "type": "array",
+                  "maxItems": 3,
+                  "items": {
+                    "title": "Car",
+                    "type": "object",
+                    "properties": {
+                      "brand": {
+                        "type": "string"
+                      },
+                      "model": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["firstName", "lastName"]
+            }
+          </script>
+          <template is="dom-if" if="[[basicSchema]]">
+            <webda-model-object schema='[[basicSchema]]' edit-mode="[[editMode]]">
+              <div class="title" style="float: right;"><paper-fab icon="create" mini onclick="toggleEdit()"></paper-fab></div>
+            </webda-model-object>
+          </template>
+        </template>
+      </demo-snippet>
+    </div>
+    <script>
+      var t = document.querySelector('#t');
+      t.editMode = true;
+      var toggleEdit = function() {
+        t.editMode = !t.editMode;
+      };
+      // The dom-change event signifies when the template has stamped its DOM.
+      t.addEventListener('dom-change', function() {
+        // auto-binding template is ready.
+        t.basicSchema = basicSchema;
+      });
+    </script>
+  </body>
+</html>
