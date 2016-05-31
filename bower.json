@@ -2,6 +2,10 @@
   "name": "webda-model-schema",
   "description": "Dynamic create form based on JSON Schemas",
   "main": "webda-model-object.html",
+  "keywords": [
+    "web-components",
+    "webda"
+  ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "webda-webcomponents": "~0.1.1",
