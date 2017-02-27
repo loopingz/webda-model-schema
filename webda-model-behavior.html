@@ -120,13 +120,13 @@ Webda.Behaviors.ModelDisplay = {
     }
     // Create the element
     var el = this.create(this.typeWidgets[definition.type], attrs);
-    el.addEventListener('value-changed', (evt) => {
+    el.addEventListener('value-changed', function(evt) {
       if (evt.info) {
         return;
       }
       evt.info = this.tagName;
       this._updateModelValue(prop, evt.detail.value);
-    });
+    }.bind(this));
     if ((definition.type === 'object' || definition.type === 'array') && el._generateModelWidgets) {
       el._generateModelWidgets();
     }
