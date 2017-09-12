@@ -8,11 +8,11 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <dom-module id="webda-model-number">
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style is="custom-style" include="shared-styles"></style>
     <template is="dom-if" if="[[editMode]]">
       <paper-input id="input" value="{{value}}" type="number" label="[[schema.title]]"></paper-input>
     </template>
@@ -23,49 +23,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </template>
   </template>
+  <script>
+  /**
+   * @demo demo/index.html
+   */
+  class WebdaModelNumber extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+    static get is() { return 'webda-model-number'; }
+    static get properties() {
+      return {
+        value: {
+          "type": "Number",
+            "observer": "_validateInput"
+        }
+      };
+    }
+    _validateInput() {
+      if (!this.editMode) return;
+      if (!this.$$('paper-input')) return;
+      this.$$('paper-input').invalid = !this._validate();
+    }
+    _validate() {
+      if (this.schema.multipleOf) {
+        if (this.value % this.schema.multipleOf !== 0 || this.value <= 0) {
+          return false;
+        }
+      }
+      if (this.schema.maximum !== undefined) {
+        if (this.value > this.schema.maximum) {
+          return false;
+        }
+        if (this.value === this.schema.maximum && this.schema.exclusiveMaximum) {
+          return false;
+        }
+      }
+      if (this.schema.minimum !== undefined) {
+        if (this.value < this.schema.minimum) {
+          return false;
+        }
+        if (this.value === this.schema.minimum && this.schema.exclusiveMinimum) {
+          return false;
+        }
+      }
+      return true;
+    }
+  };
+  window.customElements.define(WebdaModelNumber.is, WebdaModelNumber);
+  </script>
 </dom-module>
-
-<script>
-/**
- * @demo demo/index.html
- */
-Polymer({
-  is: 'webda-model-number',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  properties: {
-    value: {
-      "type": "Number",
-      "observer": "_validateInput"
-    }
-  },
-  _validateInput: function() {
-    if (!this.editMode) return;
-    if (!this.$$('paper-input')) return;
-    this.$$('paper-input').invalid = !this._validate();
-  },
-  _validate: function() {
-    if (this.schema.multipleOf) {
-      if (this.value % this.schema.multipleOf !== 0 || this.value <= 0) {
-        return false;
-      }
-    }
-    if (this.schema.maximum !== undefined) {
-      if (this.value > this.schema.maximum) {
-        return false;
-      }
-      if (this.value === this.schema.maximum && this.schema.exclusiveMaximum) {
-        return false;
-      }
-    }
-    if (this.schema.minimum !== undefined) {
-      if (this.value < this.schema.minimum) {
-        return false;
-      }
-      if (this.value === this.schema.minimum && this.schema.exclusiveMinimum) {
-        return false;
-      }
-    }
-    return true;
-  }
-});
-</script>

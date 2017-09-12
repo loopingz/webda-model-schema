@@ -8,10 +8,10 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-list">
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style is="custom-style" include="shared-styles"></style>
     <template is="dom-if" if="[[editMode]]">
       <paper-dropdown-menu label="[[definition.label]]" style="width: 100%;">
         <paper-menu class="dropdown-content" selected="{{value}}" selectedAttribute="key">
@@ -28,12 +28,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </dom-module>
 
 <script>
-Polymer({
-  is: 'webda-model-list',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  properties: {
-    value: String,
-    definition: Object
+class WebdaModelList extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+  static get is() {
+    return 'webda-model-list';
   }
-});
+
+  static get properties() {
+    return {
+      value: String,
+      definition: Object
+    };
+  }
+}
+window.customElements.define(WebdaModelList.is, WebdaModelList);
 </script>

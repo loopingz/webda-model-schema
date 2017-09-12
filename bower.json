@@ -7,10 +7,7 @@
     "webda"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0",
-    "webda-webcomponents": "~0.1.1",
-    "paper-checkbox": "~1.2.0",
-    "paper-date-picker": "polymer-paper-datepicker#^1.2.0"
+    "polymer": "Polymer/polymer#^2.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

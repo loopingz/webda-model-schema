@@ -9,10 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-boolean">
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style is="custom-style" include="shared-styles"></style>
     <div>
       <paper-checkbox disabled="[[!editMode]]" checked="{{value}}" label="[[schema.title]]" on-change="checkChange"></paper-checkbox>{{schema.title}}
     </div>
@@ -23,11 +23,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 /**
  * @demo demo/index.html
  */
-Polymer({
-  is: 'webda-model-boolean',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  checkChange: function() {
+class WebdaModelBoolean extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+  static get is() { return 'webda-model-boolean'; }
+  checkChange() {
     this.fire('value-changed', {'value':this.value});
   }
-});
+};
+window.customElements.define(WebdaModelBoolean.is, WebdaModelBoolean);
 </script>

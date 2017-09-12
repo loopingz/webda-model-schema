@@ -8,10 +8,10 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-array">
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style is="custom-style" include="shared-styles"></style>
     <style>
       #content {
         margin-top: 10px;
@@ -37,45 +37,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </dom-module>
 
 <script>
-Polymer({
-  is: 'webda-model-array',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  properties: {
-    value: {
-      type: Array,
-      value: function() { return [];},
-      observer: '_addItems'
-    },
-    canAdd: {
-      type: Boolean,
-      value: true
-    },
-    editMode: {
-      type: Boolean,
-      observer: '_editModeChanged'
-    },
-  },
-  _updateCanAdd: function() {
-    if (!this.editMode || 
-          (this.schema && this.schema.maxItems && this.schema.properties 
+class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+  static get is() { return 'webda-model-array'; }
+  static get properties() {
+    return {
+      value: {
+        type: Array,
+        value: function () {
+          return [];
+        },
+        observer: '_addItems'
+      },
+      canAdd: {
+        type: Boolean,
+        value: true
+      },
+      editMode: {
+        type: Boolean,
+        observer: '_editModeChanged'
+      },
+    };
+  }
+  _updateCanAdd() {
+    if (!this.editMode ||
+          (this.schema && this.schema.maxItems && this.schema.properties
             && Object.keys(this.schema.properties).length >= this.schema.maxItems)) {
       this.canAdd = false;
       return;
     }
     this.canAdd = true;
-  },
-  _editModeChanged: function() {
+  }
+  _editModeChanged() {
     this._updateCanAdd();
     this._generateModelWidgets();
-  },
-  _addItems: function() {
+  }
+  _addItems() {
     if (this._init) return;
     for (let i in this.value) {
       this._addItem();
     }
     this._init = true;
-  },
-  _removeItem: function(evt) {
+  }
+  _removeItem(evt) {
     if (this.value) {
       // Remove the value
       this.value.splice(evt.target.prop, 1);
@@ -87,8 +90,8 @@ Polymer({
       this._updateCanAdd();
       this._generateModelWidgets();
     }
-  },
-  _generateTypeWidget: function(prop) {
+  }
+  _generateTypeWidget(prop) {
     var div = this.create('div');
     let el = Webda.Behaviors.ModelDisplay._generateTypeWidget.call(this, prop);
     if (this.editMode) {
@@ -96,8 +99,8 @@ Polymer({
     }
     div.appendChild(el);
     return div;
-  },
-  _addItem: function() {
+  }
+  _addItem() {
     if (!this.schema) return;
     if (!this.schema.properties) {
       this.schema.properties = {};
@@ -108,5 +111,6 @@ Polymer({
     this._updateCanAdd();
     this._generateModelWidgets();
   }
-});
+};
+window.customElements.define(WebdaModelArray.is, WebdaModelArray);
 </script>

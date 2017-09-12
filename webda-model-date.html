@@ -8,10 +8,11 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="../paper-date-picker/paper-date-picker.html">
+<link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-date">
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style is="custom-style" include="shared-styles"></style>
     <template is="dom-if" if="[[editMode]]">
       <paper-input value="{{value}}" on-focus="focusText" label="[[definition.label]]"></paper-input>
       <paper-dialog id="date-dialog" class="paper-date-picker-dialog" modal noCancelOnEscKey="true">
@@ -26,27 +27,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <span>[[value]]</span>
     </template>
   </template>
+  <script>
+  class WebdaModelDate extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+    static get is() { return 'webda-model-date'; }
+    static get properties() {
+      return {
+        date: Date,
+        value: String,
+        definition: Object,
+        editMode: {
+          type: Boolean,
+          value: false
+        }
+      };
+    }
+    _generateModelWidgets() {
+      // NOP
+    }
+    focusText() {
+      this.shadowRoot.querySelector("#date-dialog").open();
+    }
+    cancelDialog() {
+      this.shadowRoot.querySelector("#date-dialog").close();
+    }
+    setDate() {
+      this.value = this.date.toLocaleDateString();
+      this.shadowRoot.querySelector("#date-dialog").close();
+    }
+  };
+  window.customElements.define(WebdaModelDate.is, WebdaModelDate);
+  </script>
 </dom-module>
-
-<script>
-Polymer({
-  is: 'webda-model-date',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  focusText: function() {
-    this.$$("#date-dialog").open();
-  },
-  cancelDialog: function() {
-    this.$$("#date-dialog").close();
-  },
-  setDate: function() {
-    console.log("Should set date now");
-    this.value = this.date.toLocaleDateString();
-    this.$$("#date-dialog").close();
-  },
-  properties: {
-    date: Date,
-    value: String,
-    definition: Object
-  }
-});
-</script>

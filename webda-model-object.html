@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-object">
   <template>
     <style>
@@ -32,22 +32,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 /**
  * @demo demo/index.html
  */
-Polymer({
-  is: 'webda-model-object',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  properties: {
-     /**
+class WebdaModelObject extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+  static get is() { return 'webda-model-object'; }
+  static get properties() {
+    return {
+      /**
        * Current value of the object mapped to the JSON Schema
        *
        * @attribute label
        * @type string
        * @default ''
        */
-    value: {
-      type: Object,
-      notify: true,
-      value: {}
-    }
+      value: {
+        type: Object,
+        notify: true,
+        value: {}
+      }
+    };
   }
-});
+};
+window.customElements.define(WebdaModelObject.is, WebdaModelObject);
 </script>

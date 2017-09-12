@@ -8,21 +8,21 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="webda-model-behavior.html">
+<link rel="import" href="webda-model-mixin.html">
 <link rel="import" href="../iron-autogrow-textarea/iron-autogrow-textarea.html">
 <dom-module id="webda-model-multiline">
-  <style type="text/css">
-  :host {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: block;
-  }
-  #label[focused="true"], :host:hover #label {
-    color: var(--default-primary-color);
-  }
-  </style>
-  <style is="custom-style" include="shared-styles"></style>
   <template>
+    <style type="text/css">
+      :host {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: block;
+      }
+      #label[focused="true"], :host:hover #label {
+        color: var(--default-primary-color);
+      }
+    </style>
+    <style is="custom-style" include="shared-styles"></style>
     <template is="dom-if" if="[[editMode]]">
       <template is="dom-if" if="[[displayLabel(value)]]">
         <label id="label" focused$="{{ focused }}">[[schema.title]]</label>
@@ -36,29 +36,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </template>
   </template>
-</dom-module>
-
-<script>
-Polymer({
-  is: 'webda-model-multiline',
-  behaviors: [Webda.Behaviors.ModelDisplay],
-  displayLabel: function(value) {
-    return value !== undefined && value !== '';
-  },
-  labelClass: function() {
-    if (this.focused) {
+  <script>
+  class WebdaModelMultiLine extends Webda.Mixins.ModelDisplay(Polymer.Element) {
+    static get is() { return 'webda-model-multiline'; }
+    static get properties() {
+      return {
+        value: String,
+        editMode: {
+          type: Boolean,
+          value: false
+        }
+      }
+    }
+    _generateModelWidgets() {
+      // NOP
+    }
+    displayLabel(value) {
+      return value !== undefined && value !== '';
+    }
+    labelClass() {
+      if (this.focused) {
+        return "focused";
+      }
       return "focused";
     }
-    return "focused";
-  },
-  blurText: function() {
-    this.focused = false;
-  },
-  focusText: function() {
-    this.focused = true;
-  },
-  properties: {
-    value: String
-  }
-});
-</script>
+    blurText() {
+      this.focused = false;
+    }
+    focusText() {
+      this.focused = true;
+    }
+  };
+  window.customElements.define(WebdaModelMultiLine.is, WebdaModelMultiLine);
+  </script>
+</dom-module>
