@@ -16,14 +16,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-left: 20px;
         margin-top: 10px;
       }
+      .description {
+        font-size: 12px;
+        @apply(--webda-model-description-style);
+      }
     </style>
     <div>
-    <content select=".header"></content>
+    <slot name=".header"></slot>
     <template is="dom-if" if="[[schema.title]]">
-        <label>[[schema.title]]</label><content select=".title"></content>
+        <label>[[schema.title]]</label><slot name="title"></slot>
+    </template>
+    <template is="dom-if" if="[[editMode]]">
+      <template is="dom-if" if="[[schema.description]]">
+        <div class="description">[[schema.description]]</div>
+      </template>
     </template>
     <div id="content"></div>
-    <content select=".footer"></content>
+    <slot name="footer"></slot>
     </div>
   </template>
 </dom-module>

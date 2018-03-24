@@ -7,7 +7,7 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-array">
   <template>
@@ -18,9 +18,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-left: 20px;
       }
       iron-icon {
-        left: -30px;
+        left: -10px;
         position: relative;
-        margin-bottom: -40px;
+        margin-bottom: -100px;
       }
       .arrayElement {
         position: relative;
@@ -46,7 +46,7 @@ class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
         value: function () {
           return [];
         },
-        observer: '_addItems'
+        observer: '_updatedValue'
       },
       canAdd: {
         type: Boolean,
@@ -58,6 +58,12 @@ class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
       },
     };
   }
+  ready() {
+    super.ready();
+    this.addEventListener('value-changed', (evt) => {
+      console.log('value-changed', evt);
+    });
+  }
   _updateCanAdd() {
     if (!this.editMode ||
           (this.schema && this.schema.maxItems && this.schema.properties
@@ -66,6 +72,11 @@ class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
       return;
     }
     this.canAdd = true;
+  }
+  _updatedValue() {
+    if (!this.value) {
+      this.value = [];
+    }
   }
   _editModeChanged() {
     this._updateCanAdd();
@@ -82,7 +93,7 @@ class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
     if (this.value) {
       // Remove the value
       this.value.splice(evt.target.prop, 1);
-      this.fire('value-changed', {'value':this.value});
+      this.dispatchEvent(new CustomEvent('value-changed', { detail: {'value': this.value}, bubbles: true, composed: true }));
       // Reinit the schema properties accordingly
       this._init = false;
       this.schema.properties = {};
@@ -92,10 +103,14 @@ class WebdaModelArray extends Webda.Mixins.ModelDisplay(Polymer.Element) {
     }
   }
   _generateTypeWidget(prop) {
-    var div = this.create('div');
-    let el = Webda.Behaviors.ModelDisplay._generateTypeWidget.call(this, prop);
+    var div = window.document.createElement('div');
+    let el = super._generateTypeWidget(prop);
     if (this.editMode) {
-      div.appendChild(this.create('iron-icon', {icon: 'close', onclick: this._removeItem.bind(this), prop: prop}));
+      let iron = window.document.createElement('iron-icon');
+      iron.icon = 'close';
+      iron.onclick = this._removeItem.bind(this);
+      iron.prop = prop;
+      div.appendChild(iron);
     }
     div.appendChild(el);
     return div;

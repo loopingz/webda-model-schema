@@ -7,21 +7,31 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="webda-model-mixin.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <dom-module id="webda-model-number">
   <template>
-    <style is="custom-style" include="shared-styles"></style>
-    <template is="dom-if" if="[[editMode]]">
-      <paper-input id="input" value="{{value}}" type="number" label="[[schema.title]]"></paper-input>
-    </template>
-    <template is="dom-if" if="[[!editMode]]">
-      <div style="margin-bottom: 10px;">
-        <label>[[schema.title]]</label>
-        <div>[[value]]</div>
-      </div>
-    </template>
+    <style include="shared-styles">
+      .description {
+        font-size: 12px;
+        @apply(--webda-model-description-style);
+      }
+    </style>
+    <div>
+      <template is="dom-if" if="[[editMode]]">
+        <template is="dom-if" if="[[schema.description]]">
+          <div class="description">[[schema.description]]</div>
+        </template>
+        <paper-input allowed-pattern='[0-9\-\.]' id="input" value="{{value}}" type="number" label="[[schema.title]]"></paper-input>
+      </template>
+      <template is="dom-if" if="[[!editMode]]">
+        <div style="margin-bottom: 10px;">
+          <label>[[schema.title]]</label>
+          <div>[[value]]</div>
+        </div>
+      </template>
+    </div>
   </template>
   <script>
   /**
@@ -33,16 +43,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       return {
         value: {
           "type": "Number",
-            "observer": "_validateInput"
+          "observer": "_validateInput"
         }
       };
     }
     _validateInput() {
       if (!this.editMode) return;
-      if (!this.$$('paper-input')) return;
-      this.$$('paper-input').invalid = !this._validate();
+      if (!this.shadowRoot.querySelector('paper-input')) return;
+      this.shadowRoot.querySelector('paper-input').invalid = !this._validate();
+    }
+
+    _generateModelWidgets() {
+      // NOP
     }
     _validate() {
+      this.value = Number(this.value);
       if (this.schema.multipleOf) {
         if (this.value % this.schema.multipleOf !== 0 || this.value <= 0) {
           return false;

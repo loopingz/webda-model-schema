@@ -7,7 +7,7 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../webda-core/webda-core.html">
 <script>
 if (!Webda.Models) {
@@ -40,7 +40,8 @@ Webda.Mixins.ModelDisplay = Polymer.dedupingMixin((superClass) =>
          * See http://json-schema.org/ for definition
          */
         schema: {
-          type: Object
+          type: Object,
+          observer: '_generateModelWidgets'
         },
         /**
          * Object to display accordingly to the schema previously defined
@@ -94,6 +95,21 @@ Webda.Mixins.ModelDisplay = Polymer.dedupingMixin((superClass) =>
       this._generateModelWidgets();
     }
 
+    _defaultValue(type) {
+      type = type || this.type;
+      if (type === 'string') {
+        return "";
+      } else if (type === 'number' || type === 'integer') {
+        return 0;
+      } else if (type === 'array') {
+        return [];
+      } else if (type === 'object') {
+        return {};
+      } else if (type === 'boolean') {
+        return false;
+      }
+    }
+
     _generateTypeWidget(prop) {
       // Get definition
       var definition = this.schema.properties[prop];
@@ -115,37 +131,45 @@ Webda.Mixins.ModelDisplay = Polymer.dedupingMixin((superClass) =>
       var attrs = {};
       attrs.editMode = this.editMode;
       this._getModelElementAttributes(prop, attrs);
-      if (!attrs.value && definition.type === "object") {
-        attrs.value = {};
+      if (!attrs.value) {
+        attrs.value = this._defaultValue(definition.type);
       }
       // If no title is set then add the property name as title
       if (attrs.schema.title === undefined) {
         attrs.schema.title = prop;
       }
       // Create the element
-      var el = this.create(this.typeWidgets[definition.type], attrs);
+      var el = document.createElement(this.typeWidgets[definition.type]);
+      if (!el) {
+        console.log("Failed to create widget", type, definition);
+        return;
+      }
+      el.schema = attrs.schema;
+      el.value = attrs.value;
+      el.editMode = attrs.editMode;
       el.addEventListener('value-changed', (evt) => {
         if (evt.info) {
           return;
         }
         evt.info = this.tagName;
+        evt.stopPropagation();
         this._updateModelValue(prop, evt.detail.value);
       });
-      if ((definition.type === 'object' || definition.type === 'array') && el._generateModelWidgets) {
-        el._generateModelWidgets();
-      }
       return el;
     }
 
     _getModelElementAttributes(prop, attrs) {
       // If a value is set for this property forward it
-      if (this.value[prop]) {
+      if (this.value && this.value[prop]) {
         attrs.value = this.value[prop];
       }
       attrs.schema = this.schema.properties[prop];
     }
 
     _updateModelValue(prop, value) {
+      if (!this.value) {
+        this.value = {};
+      }
       // Update property
       this.value[prop] = value;
       // Send the value-changed for update
@@ -157,7 +181,11 @@ Webda.Mixins.ModelDisplay = Polymer.dedupingMixin((superClass) =>
       if (this.schema === undefined) {
         return;
       }
+      if (!this.value) {
+        this.value = this._defaultValue();
+      }
       var content;
+
       // If a tag with id content exists use it, use root in other case
       if (this.$ && this.$.content) {
         while (this.$.content.firstChild) {
@@ -175,7 +203,9 @@ Webda.Mixins.ModelDisplay = Polymer.dedupingMixin((superClass) =>
       // Add the widget according to the properties
       for (var prop in this.schema.properties) {
         let type = this._generateTypeWidget(prop);
-        Polymer.dom(content).appendChild(type);
+        if (type) {
+          Polymer.dom(content).appendChild(type);
+        }
       }
     }
   }

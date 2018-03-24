@@ -1,10 +1,19 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="webda-model-mixin.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <dom-module id="webda-model-string">
   <template>
+    <style include="shared-styles">
+      .description {
+        font-size: 12px;
+        @apply(--webda-model-description-style);
+      }
+    </style>
     <div>
     <template is="dom-if" if="[[editMode]]">
+      <template is="dom-if" if="[[schema.description]]">
+        <div class="description">[[schema.description]]</div>
+      </template>
       <paper-input value="{{value}}" label="[[schema.title]]"></paper-input>
     </template>
     <template is="dom-if" if="[[!editMode]]">

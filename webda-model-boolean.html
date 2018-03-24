@@ -7,7 +7,7 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="webda-model-mixin.html">
 <dom-module id="webda-model-boolean">
@@ -25,8 +25,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
  */
 class WebdaModelBoolean extends Webda.Mixins.ModelDisplay(Polymer.Element) {
   static get is() { return 'webda-model-boolean'; }
+
+  _generateModelWidgets() {
+    // NOP
+  }
+
   checkChange() {
-    this.fire('value-changed', {'value':this.value});
+    this.dispatchEvent(new CustomEvent('value-changed', { detail: {'value': this.value}, bubbles: true, composed: true }));
   }
 };
 window.customElements.define(WebdaModelBoolean.is, WebdaModelBoolean);
